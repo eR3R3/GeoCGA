@@ -1,0 +1,629 @@
+{
+  "The longest knife on the wall, with a black handle and a sharp metal blade.": {
+    "target": {
+      "category": "knife",
+      "attribute": ["longest", "black handle", "sharp metal blade"]
+    },
+    "tuples": [
+      ["knife", "on", "wall"]
+    ]
+  },
+  "The longest knife on the wooden knife rack has a simple design.": {
+    "target": {
+      "category": "knife",
+      "attribute": ["longest", "simple design"]
+    },
+    "tuples": [
+      ["knife", "on", "wooden knife rack"]
+    ]
+  },
+  "The longest kitchen knife on the rack is prominently displayed on the wall.": {
+    "target": {
+      "category": "knife",
+      "attribute": ["longest", "kitchen"]
+    },
+    "tuples": [
+      ["knife", "on", "rack"],
+      ["rack", "on", "wall"]
+    ]
+  },
+  "The longest knife in the kitchen, with a black handle and a smooth, sharp blade.": {
+    "target": {
+      "category": "knife",
+      "attribute": ["longest", "black handle", "smooth", "sharp blade"]
+    },
+    "tuples": [
+      ["knife", "in", "kitchen"]
+    ]
+  },
+  "Two cookbooks with white covers are standing upright against the wall on the kitchen shelf.": {
+    "target": {
+      "category": "cookbook",
+      "attribute": ["two", "white covers", "standing upright"]
+    },
+    "tuples": [
+      ["cookbooks", "against", "wall"],
+      ["cookbooks", "on", "kitchen shelf"]
+    ]
+  },
+  "Two white books on the left-side cabinet, with simple covers, appear to be cookbooks for the kitchen.": {
+    "target": {
+      "category": "cookbook",
+      "attribute": ["two", "white", "simple covers"]
+    },
+    "tuples": [
+      ["books", "on", "left-side cabinet"],
+      ["books", "for", "kitchen"]
+    ]
+  },
+  "Two books with white covers are placed on the shelf in the cabinet.": {
+    "target": {
+      "category": "cookbook",
+      "attribute": ["two", "white covers"]
+    },
+    "tuples": [
+      ["books", "on", "shelf"],
+      ["shelf", "in", "cabinet"]
+    ]
+  },
+  "Two cookbooks are neatly placed on the kitchen cabinet, though the arrangement is somewhat disorganized.": {
+    "target": {
+      "category": "cookbook",
+      "attribute": ["two", "neatly placed", "somewhat disorganized arrangement"]
+    },
+    "tuples": [
+      ["cookbooks", "on", "kitchen cabinet"]
+    ]
+  },
+  "A transparent glass container with a black middle section, placed on a yellow countertop.": {
+    "target": {
+      "category": "pour-over vessel",
+      "attribute": ["transparent glass", "black middle section"]
+    },
+    "tuples": [
+      ["glass container", "on", "yellow countertop"]
+    ]
+  },
+  "A glass coffee pot with a simple design and a black accessory on the top.": {
+    "target": {
+      "category": "pour-over vessel",
+      "attribute": ["glass", "simple design", "black accessory"]
+    },
+    "tuples": [
+      ["black accessory", "on", "glass coffee pot"]
+    ]
+  },
+  "A glass container used for brewing coffee, with a simple and practical shape.": {
+    "target": {
+      "category": "pour-over vessel",
+      "attribute": ["glass", "for brewing coffee", "simple shape", "practical shape"]
+    },
+    "tuples": [
+      ["glass container", "used_for", "brewing coffee"]
+    ]
+  },
+  "A black and transparent container with a funnel-like shape, featuring a minimalist design.": {
+    "target": {
+      "category": "pour-over vessel",
+      "attribute": ["black and transparent", "funnel-like shape", "minimalist design"]
+    },
+    "tuples": []
+  },
+  "A small stainless steel pot with a shiny surface, placed on the dish rack.": {
+    "target": {
+      "category": "stainless steel pot",
+      "attribute": ["small", "shiny surface"]
+    },
+    "tuples": [
+      ["stainless steel pot", "on", "dish rack"]
+    ]
+  },
+  "A metal-textured round container, neatly arranged with other kitchen tools.": {
+    "target": {
+      "category": "stainless steel pot",
+      "attribute": ["metal-textured", "round", "neatly arranged"]
+    },
+    "tuples": [
+      ["round container", "with", "other kitchen tools"]
+    ]
+  },
+  "A smooth stainless steel cooking utensil with a rounded shape, placed next to other items.": {
+    "target": {
+      "category": "stainless steel pot",
+      "attribute": ["smooth", "stainless steel", "rounded shape"]
+    },
+    "tuples": [
+      ["cooking utensil", "next_to", "other items"]
+    ]
+  },
+  "A silver small pot made of stainless steel, placed in a basket on the kitchen counter.": {
+    "target": {
+      "category": "stainless steel pot",
+      "attribute": ["silver", "small", "stainless steel"]
+    },
+    "tuples": [
+      ["small pot", "in", "basket"],
+      ["basket", "on", "kitchen counter"]
+    ]
+  },
+  "A silver toaster, placed on a yellow countertop, with a smooth surface.": {
+    "target": {
+      "category": "toaster",
+      "attribute": ["silver", "smooth surface"]
+    },
+    "tuples": [
+      ["toaster", "on", "yellow countertop"]
+    ]
+  },
+  "A compact baking appliance with a rectangular metal casing, placed on the kitchen counter.": {
+    "target": {
+      "category": "toaster",
+      "attribute": ["compact", "rectangular metal casing"]
+    },
+    "tuples": [
+      ["baking appliance", "on", "kitchen counter"]
+    ]
+  },
+  "A small device used for baking, with a minimalist design, quietly placed on the countertop.": {
+    "target": {
+      "category": "toaster",
+      "attribute": ["small", "for baking", "minimalist design"]
+    },
+    "tuples": [
+      ["device", "on", "countertop"]
+    ]
+  },
+  "A toaster made of silver metal, with a modern look, blending seamlessly into the kitchen.": {
+    "target": {
+      "category": "toaster",
+      "attribute": ["silver metal", "modern look"]
+    },
+    "tuples": [
+      ["toaster", "in", "kitchen"]
+    ]
+  },
+  "A bright yellow kitchen countertop with a smooth surface, adding a vibrant touch to the kitchen.": {
+    "target": {
+      "category": "countertop",
+      "attribute": ["bright yellow", "smooth surface", "kitchen"]
+    },
+    "tuples": [
+      ["countertop", "in", "kitchen"]
+    ]
+  },
+  "A wide work surface, with the yellow tone contrasting sharply with the white cabinets.": {
+    "target": {
+      "category": "countertop",
+      "attribute": ["wide", "yellow tone"]
+    },
+    "tuples": [
+      ["work surface", "contrasts_with", "white cabinets"]
+    ]
+  },
+  "The yellow kitchen countertop, with a simple and clean design, holding various kitchen tools and appliances.": {
+    "target": {
+      "category": "countertop",
+      "attribute": ["yellow", "simple design", "clean design"]
+    },
+    "tuples": [
+      ["countertop", "holding", "kitchen tools and appliances"]
+    ]
+  },
+  "A smooth yellow countertop with a bright tone, complementing the overall style of the kitchen.": {
+    "target": {
+      "category": "countertop",
+      "attribute": ["smooth", "yellow", "bright tone"]
+    },
+    "tuples": [
+      ["countertop", "in", "kitchen"]
+    ]
+  },
+  "A bright green spoon, neatly hanging on a pegboard.": {
+    "target": {
+      "category": "ladle",
+      "attribute": ["bright green", "neatly hanging"]
+    },
+    "tuples": [
+      ["spoon", "on", "pegboard"]
+    ]
+  },
+  "A long-handled green kitchen tool with a brush-shaped end, designed to be multifunctional.": {
+    "target": {
+      "category": "ladle",
+      "attribute": ["long-handled", "green", "brush-shaped end", "multifunctional"]
+    },
+    "tuples": []
+  },
+  "A small green-handled tool, spoon-shaped, hanging lightly on the wall.": {
+    "target": {
+      "category": "ladle",
+      "attribute": ["small", "green-handled", "spoon-shaped"]
+    },
+    "tuples": [
+      ["tool", "on", "wall"]
+    ]
+  },
+  "A green kitchen utensil, highly functional, arranged alongside other kitchen tools.": {
+    "target": {
+      "category": "ladle",
+      "attribute": ["green", "highly functional"]
+    },
+    "tuples": [
+      ["kitchen utensil", "alongside", "other kitchen tools"]
+    ]
+  },
+  "A metal round pot with a shiny surface, hanging on the pegboard on the wall.": {
+    "target": {
+      "category": "pot",
+      "attribute": ["metal", "round", "shiny surface"]
+    },
+    "tuples": [
+      ["pot", "on", "pegboard"],
+      ["pegboard", "on", "wall"]
+    ]
+  },
+  "A round cookware hanging on the wall, with a smooth shape, neatly arranged alongside other kitchen tools.": {
+    "target": {
+      "category": "pot",
+      "attribute": ["round", "smooth shape", "neatly arranged"]
+    },
+    "tuples": [
+      ["cookware", "on", "wall"],
+      ["cookware", "alongside", "other kitchen tools"]
+    ]
+  },
+  "A frying pan with a reflective surface, simple in design, hanging in a prominent position on the wall.": {
+    "target": {
+      "category": "frying pan",
+      "attribute": ["reflective surface", "simple design", "prominent position"]
+    },
+    "tuples": [
+      ["frying pan", "on", "wall"]
+    ]
+  },
+  "A round pot with a metallic sheen, lightweight and practical, hanging on the pegboard.": {
+    "target": {
+      "category": "pot",
+      "attribute": ["round", "metallic sheen", "lightweight", "practical"]
+    },
+    "tuples": [
+      ["pot", "on", "pegboard"]
+    ]
+  },
+  "A white refrigerator with a surface covered in magnets, photos and various pieces of paper.": {
+    "target": {
+      "category": "refrigerator",
+      "attribute": ["white", "covered with magnets", "photos", "papers"]
+    },
+    "tuples": [
+      ["magnets, photos and papers", "on", "refrigerator surface"]
+    ]
+  },
+  "A tall white appliance with a clean look that blends in with the style of the kitchen.": {
+    "target": {
+      "category": "refrigerator",
+      "attribute": ["tall", "white", "clean look"]
+    },
+    "tuples": [
+      ["appliance", "in", "kitchen"]
+    ]
+  },
+  "A refrigeration unit with a smooth white appearance decorated with various photos and stickers.": {
+    "target": {
+      "category": "refrigerator",
+      "attribute": ["smooth white appearance", "decorated with photos and stickers"]
+    },
+    "tuples": [
+      ["photos and stickers", "on", "refrigeration unit"]
+    ]
+  },
+  "A white refrigerator with a smooth finish and decorated with home-style decorations.": {
+    "target": {
+      "category": "refrigerator",
+      "attribute": ["white", "smooth finish", "home-style decorations"]
+    },
+    "tuples": [
+      ["decorations", "on", "refrigerator"]
+    ]
+  },
+  "A red spatula with a flat, wide head, hanging vertically on the pegboard.": {
+    "target": {
+      "category": "spatula",
+      "attribute": ["red", "flat wide head", "hanging vertically"]
+    },
+    "tuples": [
+      ["spatula", "on", "pegboard"]
+    ]
+  },
+  "A smooth red kitchen tool with a rectangular head, clearly different from the scissors beside it.": {
+    "target": {
+      "category": "spatula",
+      "attribute": ["smooth", "red", "rectangular head"]
+    },
+    "tuples": [
+      ["kitchen tool", "beside", "scissors"]
+    ]
+  },
+  "A red kitchen tool hanging on the wall, distinctly separate from the scissors.": {
+    "target": {
+      "category": "spatula",
+      "attribute": ["red", "distinctly separate"]
+    },
+    "tuples": [
+      ["kitchen tool", "on", "wall"],
+      ["kitchen tool", "separate_from", "scissors"]
+    ]
+  },
+  "A red spatula-like kitchen tool used for cooking, distinct from the cutting tools on the board.": {
+    "target": {
+      "category": "spatula",
+      "attribute": ["red", "spatula-like", "used for cooking"]
+    },
+    "tuples": [
+      ["kitchen tool", "distinct_from", "cutting tools on the board"]
+    ]
+  },
+  "A white cabinet with a minimalist design hangs neatly above the refrigerator.": {
+    "target": {
+      "category": "cabinet",
+      "attribute": ["white", "minimalist design", "hanging neatly"]
+    },
+    "tuples": [
+      ["cabinet", "above", "refrigerator"]
+    ]
+  },
+  "A small storage cabinet with a rectangular shape that blends perfectly with the overall layout of the kitchen.": {
+    "target": {
+      "category": "cabinet",
+      "attribute": ["small", "storage", "rectangular shape"]
+    },
+    "tuples": [
+      ["storage cabinet", "in", "kitchen"]
+    ]
+  },
+  "A white wall cabinet with metal handles positioned above the refrigerator.": {
+    "target": {
+      "category": "cabinet",
+      "attribute": ["white", "wall cabinet", "metal handles"]
+    },
+    "tuples": [
+      ["cabinet", "above", "refrigerator"]
+    ]
+  },
+  "A simple white cabinet that provides additional storage space in the corner of the kitchen.": {
+    "target": {
+      "category": "cabinet",
+      "attribute": ["simple", "white", "additional storage"]
+    },
+    "tuples": [
+      ["cabinet", "in", "corner of the kitchen"]
+    ]
+  },
+  "A small red ketchup bottle, neatly placed on the top tier of the spice rack on the wall.": {
+    "target": {
+      "category": "ketchup bottle",
+      "attribute": ["small", "red", "neatly placed"]
+    },
+    "tuples": [
+      ["ketchup bottle", "on", "top tier of spice rack"],
+      ["spice rack", "on", "wall"]
+    ]
+  },
+  "A compact red container, resembling ketchup, positioned among other seasonings.": {
+    "target": {
+      "category": "ketchup bottle",
+      "attribute": ["compact", "red", "resembling ketchup"]
+    },
+    "tuples": [
+      ["container", "among", "other seasonings"]
+    ]
+  },
+  "A bright red bottle, contrasting sharply with the other items on the spice rack.": {
+    "target": {
+      "category": "ketchup bottle",
+      "attribute": ["bright red", "contrasting sharply"]
+    },
+    "tuples": [
+      ["bottle", "on", "spice rack"]
+    ]
+  },
+  "A red bottle resembling ketchup, lightweight and bright, placed on the upper shelf.": {
+    "target": {
+      "category": "ketchup bottle",
+      "attribute": ["red", "resembling ketchup", "lightweight", "bright"]
+    },
+    "tuples": [
+      ["bottle", "on", "upper shelf"]
+    ]
+  },
+  "A small dark colored item with a silver spoon in it, located in the sink.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["small", "dark colored"]
+    },
+    "tuples": [
+      ["silver spoon", "in", "dark cup"],
+      ["dark cup", "in", "sink"]
+    ]
+  },
+  "A cup-shaped, dark-colored item with a simple design, arranged with other dishes.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["cup-shaped", "dark-colored", "simple design"]
+    },
+    "tuples": [
+      ["dark cup", "with", "other dishes"]
+    ]
+  },
+  "A black cup with a smooth surface, compact and small, sandwiched between dishes in the sink.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["black", "smooth surface", "compact", "small"]
+    },
+    "tuples": [
+      ["black cup", "between", "dishes"],
+      ["black cup", "in", "sink"]
+    ]
+  },
+  "A small dark-colored object with a simple shape and a spoon inside, located in the wash area.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["small", "dark-colored", "simple shape"]
+    },
+    "tuples": [
+      ["spoon", "inside", "dark cup"],
+      ["dark cup", "in", "wash area"]
+    ]
+  },
+  "A white mug with a frog motif that sits between the dishes in the sink.": {
+    "target": {
+      "category": "mug",
+      "attribute": ["white", "frog motif"]
+    },
+    "tuples": [
+      ["mug", "between", "dishes"],
+      ["mug", "in", "sink"]
+    ]
+  },
+  "A white mug decorated with a cute green frog pattern.": {
+    "target": {
+      "category": "mug",
+      "attribute": ["white", "cute green frog pattern"]
+    },
+    "tuples": [
+      ["frog pattern", "on", "mug"]
+    ]
+  },
+  "A lightweight white mug with a lively frog motif on the side of the mug.": {
+    "target": {
+      "category": "mug",
+      "attribute": ["lightweight", "white", "lively frog motif"]
+    },
+    "tuples": [
+      ["frog motif", "on", "side of mug"]
+    ]
+  },
+  "A white object with a frog decoration, placed in the sink with other dishes.": {
+    "target": {
+      "category": "mug",
+      "attribute": ["white", "frog decoration"]
+    },
+    "tuples": [
+      ["frog-decorated mug", "in", "sink"],
+      ["frog-decorated mug", "with", "other dishes"]
+    ]
+  },
+  "A white plate with a simple design, placed in the sink alongside a black mug and a white mug.": {
+    "target": {
+      "category": "plate",
+      "attribute": ["white", "simple design"]
+    },
+    "tuples": [
+      ["plate", "in", "sink"],
+      ["plate", "alongside", "black mug and white mug"]
+    ]
+  },
+  "A light-colored round object with a flat shape, placed next to a blue cup.": {
+    "target": {
+      "category": "plate",
+      "attribute": ["light-colored", "round", "flat shape"]
+    },
+    "tuples": [
+      ["round object", "next_to", "blue cup"]
+    ]
+  },
+  "A white round plate with a simple style, placed with several cups in the washing area.": {
+    "target": {
+      "category": "plate",
+      "attribute": ["white", "round", "simple style"]
+    },
+    "tuples": [
+      ["plate", "with", "several cups"],
+      ["plate", "in", "washing area"]
+    ]
+  },
+  "A large white round item with a smooth surface, placed near mugs and other items.": {
+    "target": {
+      "category": "plate",
+      "attribute": ["large", "white", "round", "smooth surface"]
+    },
+    "tuples": [
+      ["round item", "near", "mugs and other items"]
+    ]
+  },
+  "A silver soup spoon, placed inside a black cup, with a smooth and shiny surface.": {
+    "target": {
+      "category": "spoon",
+      "attribute": ["silver", "soup spoon", "smooth", "shiny surface"]
+    },
+    "tuples": [
+      ["spoon", "inside", "black cup"]
+    ]
+  },
+  "A small metal object, shaped like a spoon, standing upright in a dark-colored cup.": {
+    "target": {
+      "category": "spoon",
+      "attribute": ["small", "metal", "spoon-shaped", "standing upright"]
+    },
+    "tuples": [
+      ["metal object", "in", "dark-colored cup"]
+    ]
+  },
+  "A lightweight silver utensil, placed inside a black cup, alongside other tableware.": {
+    "target": {
+      "category": "spoon",
+      "attribute": ["lightweight", "silver"]
+    },
+    "tuples": [
+      ["utensil", "inside", "black cup"],
+      ["utensil", "alongside", "other tableware"]
+    ]
+  },
+  "A slender silver utensil, with a rounded end, inserted into a black cup.": {
+    "target": {
+      "category": "spoon",
+      "attribute": ["slender", "silver", "rounded end"]
+    },
+    "tuples": [
+      ["utensil", "in", "black cup"]
+    ]
+  },
+  "A red cup with a white interior, placed on a white plate in the sink.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["red", "white interior"]
+    },
+    "tuples": [
+      ["red cup", "on", "white plate"],
+      ["white plate", "in", "sink"]
+    ]
+  },
+  "A vibrant red cup with a silver spoon inside, featuring a simple design.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["vibrant red", "simple design"]
+    },
+    "tuples": [
+      ["silver spoon", "inside", "red cup"]
+    ]
+  },
+  "A bright red cup, paired with a white plate, creating a striking contrast.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["bright red", "striking contrast"]
+    },
+    "tuples": [
+      ["red cup", "paired_with", "white plate"]
+    ]
+  },
+  "A red cup-like object, with a spoon inside, resting on a white plate underneath.": {
+    "target": {
+      "category": "cup",
+      "attribute": ["red", "cup-like"]
+    },
+    "tuples": [
+      ["spoon", "inside", "red cup"],
+      ["red cup", "on", "white plate"]
+    ]
+  }
+}
