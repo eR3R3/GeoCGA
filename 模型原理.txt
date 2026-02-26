@@ -1,0 +1,63 @@
+Dr-Splat
+
+预训练
+1. 使用SAM自动生成多尺度mask（default, s, m, l四个级别）
+2. 对每个mask区域提取CLIP特征
+3. 执行mask NMS（非极大值抑制）去除冗余mask
+4. 保存每个图像的特征和分割映射
+
+保存的格式如下
+对于每一个view的image有两个文件
+第一个文件
+{image_name}_s.npy，维度是[4, H, W]
+4表示SAM分割的4个大小级别，但是drsplat的codebase里面4个维度都用了最大的mask，所以四个维度是一样的
+对于每一个维度，有一个[H, W], 里面包含了所有的mask，分别用不同的数字表示, 下面是让ai生成的一个例子
+seg_map (10×10):
+-1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+-1   0   0   0  -1  -1  -1  -1  -1  -1
+-1   0   0   0  -1  -1  -1  -1  -1  -1
+-1   0   0   0  -1  -1   1   1   1  -1
+-1  -1  -1  -1  -1  -1   1   1   1  -1
+-1  -1  -1  -1  -1  -1   1   1   1  -1
+-1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+-1  -1  -1  -1  -1   2   2   2  -1  -1
+-1  -1  -1  -1  -1   2   2   2  -1  -1
+-1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+
+-1代表没有mask
+0代表第0个mask
+1代表第一个mask
+......
+注意，同一个pixel不可能属于两个mask，如果真的有，后面的mask会覆盖前面的
+
+
+第二个文件
+{image_name}_f.npy, 存储了每个mask的CLIP向量特征
+维度是[num_masks, 512], 512就是向量维度，已经经过L2归一化
+num_masks里面的index和上面的image_name里面mask所对应的数字对应
+可以用下面这行看分割出了多少物体
+python -c "import numpy as np; a=np.load('your.npy'); print('shape:', a.shape, 'dtype:', a.dtype)"
+
+
+
+
+训练
+
+先加载预训练的RGB 3DGS模型, 然后开始做Majority Voting
+majority voting
+- 对每个训练视角进行渲染，获取每个像素对应的Gaussian IDs和贡献度
+- 根据segmentation map，将CLIP特征分配给对应的Gaussians
+- 使用top-k贡献度加权平均，为每个Gaussian分配语言特征
+- 将分配的语言特征注册到Gaussian模型中
+- 保存更新后的模型checkpoint
+
+
+渲染
+1. 加载训练好的模型
+2. 解码Gaussian的语言特征
+3. 使用CLIP模型编码文本查询
+4. 计算每个Gaussian特征与文本查询的激活度（相似度）
+5. 根据阈值过滤Gaussians
+6. 将激活度映射为颜色并渲染
+
+

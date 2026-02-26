@@ -1,0 +1,292 @@
+1. 模型配置
+conda create -n drsplat python=3.9
+conda activate drsplat
+
+#这个地方注意nvcc是11.8的，不然编译出来的rasterizer无法使用
+pip install torch==2.2.1 torchvision==0.17.1 torchaudio==2.2.1 --index-url https://download.pytorch.org/whl/cu118
+pip install -r requirements.txt
+
+#这个地方要build isolation，需要gcc/clang的c/c++编译器
+pip install submodules/langsplat-rasterization
+pip install submodules/segment-anything-langsplat
+pip install submodules/simple-knn
+
+#这个地方要build isolation
+pip install ninja git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
+pip install kmeans_pytorch
+
+pip install faiss-cpu
+
+
+下载SAM的权重，要用来preprocess
+https://huggingface.co/HCMUE-Research/SAM-vit-h/blob/main/sam_vit_h_4b8939.pth
+在这个地方下载
+
+
+要下载ref-lerf和预训练好的RGB 3DGS，用hf-mirror
+wget -4 -c --timeout=20 --tries=5 --retry-connrefused \
+  -O /root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchenchkpnt30000.pth \
+  "https://hf-mirror.com/FudanCVL/RefSplat/resolve/main/kitchenchkpnt30000.pth?download=true"
+#Ref-Lerf Dataset在这里
+https://huggingface.co/datasets/FudanCVL/Ref-Lerf
+
+
+2.预处理步骤
+在preprocessing.py里面comment out这一行, 代码里面对clip类的使用已经comment掉了
+from CLIP.clip import clip
+然后下载pip install open_clip_torch, 一般应该已经装好了
+
+cd /root/autodl-tmp/Dr-Splat
+conda activate drsplat
+#这个path下面要有image folder，preprocess要用
+COLMAP_PATH="/root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen"
+mkdir -p "${COLMAP_PATH}/language_features"
+python preprocessing.py --dataset_path ${CAMERA_PATH} 
+或者直接把COLMAP_PATH写进去
+这个东西会卡半天
+python preprocessing.py --dataset_path /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen
+
+可能遇到这个问题
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat# python preprocessing.py --dataset_path /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen
+'[Errno 101] Network is unreachable' thrown while requesting HEAD https://huggingface.co/laion/CLIP-ViT-B-16-laion2B-s34B-b88K/resolve/main/open_clip_model.safetensors
+WARNING:huggingface_hub.utils._http:'[Errno 101] Network is unreachable' thrown while requesting HEAD https://huggingface.co/laion/CLIP-ViT-B-16-laion2B-s34B-b88K/resolve/main/open_clip_model.safetensors
+Retrying in 1s [Retry 1/5].
+WARNING:huggingface_hub.utils._http:Retrying in 1s [Retry 1/5].
+直接把huggingface的源换成mirror
+export HF_ENDPOINT="https://hf-mirror.com"
+就可以下载了
+他会把open_clip_model.safetensors给拉下来
+然后他就开始用clip preprocess
+Embedding images: 1it [00:41, 41.14s/it]
+大概要跑超过1个小时
+
+
+检查pth file的model args数量的
+python utils/model_args_num.py /root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchen.pth
+
+
+3. 训练
+python train.py \
+    -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen \
+    -m /root/autodl-tmp/Dr-Splat/outputs \
+    --start_checkpoint /root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchenchkpnt30000.pth \
+    --feature_level 1 \
+    --name_extra pq_openclip \
+    --use_pq \
+    --pq_index ckpts/pq_index.faiss \
+    --port 55560 \
+    --topk 45
+
+会遇到下面这样的错误(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat# python train.py \
+>     -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen \
+>     -m /root/autodl-tmp/Dr-Splat/outputs \
+>     --start_checkpoint /root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchenchkpnt30000.pth \
+>     --feature_level 1 \
+>     --name_extra pq_openclip \
+>     --use_pq \
+>     --pq_index ckpts/pq_index.faiss \
+>     --port 55560 \
+>     --topk 45
+Traceback (most recent call last):
+  File "/root/autodl-tmp/Dr-Splat/train.py", line 34, in <module>
+    import faiss
+  File "/root/miniconda3/envs/drsplat/lib/python3.9/site-packages/faiss/__init__.py", line 17, in <module>
+    from .loader import *
+  File "/root/miniconda3/envs/drsplat/lib/python3.9/site-packages/faiss/loader.py", line 98, in <module>
+    instruction_sets = supported_instruction_sets()
+  File "/root/miniconda3/envs/drsplat/lib/python3.9/site-packages/faiss/loader.py", line 56, in supported_instruction_sets
+    from numpy._core._multiarray_umath import __cpu_features__
+ModuleNotFoundError: No module named 'numpy._core'
+
+这么解决
+pip uninstall -y faiss faiss-cpu faiss-gpu
+pip install -U "numpy<2"
+pip install "faiss-cpu<1.8"
+
+然后遇到这个问题
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat# python train.py     -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen     -m /root/autodl-tmp/Dr-Splat/outputs     --start_checkpoint /root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchenchkpnt30000.pth     --feature_level 1     --name_extra pq_openclip     --use_pq     --pq_index ckpts/pq_index.faiss     --port 55560     --topk 45
+
+Namespace(sh_degree=3, source_path='/root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen', model_path='/root/autodl-tmp/Dr-Splat/outputs', language_features_name='language_features_dim3', images='images', resolution=-1, white_background=False, feature_level=1, data_device='cuda', eval=False, iterations=30000, position_lr_init=0.00016, position_lr_final=1.6e-06, position_lr_delay_mult=0.01, position_lr_max_steps=30000, feature_lr=0.0025, opacity_lr=0.05, language_feature_lr=0.0025, include_feature=True, scaling_lr=0.005, rotation_lr=0.001, percent_dense=0.01, lambda_dssim=0.2, densification_interval=100, opacity_reset_interval=3000, densify_from_iter=500, densify_until_iter=15000, densify_grad_threshold=0.0002, convert_SHs_python=False, compute_cov3D_python=False, debug=False, ip='127.0.0.1', port=55560, debug_from=-1, detect_anomaly=False, test_iterations=[0], save_iterations=[0, 30000], quiet=False, checkpoint_iterations=[0], start_checkpoint='/root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchenchkpnt30000.pth', name_extra='pq_openclip', mode='mean', topk=45, use_pq=True, pq_index='ckpts/pq_index.faiss', encoder_dims=[256, 128, 64, 32, 3], decoder_dims=[16, 32, 64, 128, 256, 256, 512], faiss_add=False)
+Reading camera 187/187 [31/01 14:49:57]
+Traceback (most recent call last):
+  File "/root/autodl-tmp/Dr-Splat/train.py", line 308, in <module>
+    training(lp.extract(args), op.extract(args), pp.extract(args), args.test_iterations, args.save_iterations, args.checkpoint_iterations, args.start_checkpoint, args.debug_from, args)
+  File "/root/autodl-tmp/Dr-Splat/train.py", line 170, in training
+    scene = Scene(dataset, gaussians)
+  File "/root/autodl-tmp/Dr-Splat/scene/__init__.py", line 56, in __init__
+    with open(scene_info.ply_path, 'rb') as src_file, open(os.path.join(self.model_path, "input.ply") , 'wb') as dest_file:
+FileNotFoundError: [Errno 2] No such file or directory: '/root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/input.ply'
+这个是一位没有创建目录，在代码里面加一行就可以了
+os.makedirs(args.model_path, exist_ok=True)
+
+然后他就会开始train这个东西了，具体原理看模型原理.txt
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat# python train.py     -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen     -m /root/autodl-tmp/Dr-Splat/outputs     --start_checkpoint /root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchenchkpnt30000.pth     --feature_level 1     --name_extra pq_openclip     --use_pq     --pq_index ckpts/pq_index.faiss     --port 55560     --topk 45
+Namespace(sh_degree=3, source_path='/root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen', model_path='/root/autodl-tmp/Dr-Splat/outputs', language_features_name='language_features_dim3', images='images', resolution=-1, white_background=False, feature_level=1, data_device='cuda', eval=False, iterations=30000, position_lr_init=0.00016, position_lr_final=1.6e-06, position_lr_delay_mult=0.01, position_lr_max_steps=30000, feature_lr=0.0025, opacity_lr=0.05, language_feature_lr=0.0025, include_feature=True, scaling_lr=0.005, rotation_lr=0.001, percent_dense=0.01, lambda_dssim=0.2, densification_interval=100, opacity_reset_interval=3000, densify_from_iter=500, densify_until_iter=15000, densify_grad_threshold=0.0002, convert_SHs_python=False, compute_cov3D_python=False, debug=False, ip='127.0.0.1', port=55560, debug_from=-1, detect_anomaly=False, test_iterations=[0], save_iterations=[0, 30000], quiet=False, checkpoint_iterations=[0], start_checkpoint='/root/autodl-tmp/Dr-Splat/3dgs-rgb/kitchenchkpnt30000.pth', name_extra='pq_openclip', mode='mean', topk=45, use_pq=True, pq_index='ckpts/pq_index.faiss', encoder_dims=[256, 128, 64, 32, 3], decoder_dims=[16, 32, 64, 128, 256, 256, 512], faiss_add=False)
+Reading camera 187/187 [31/01 14:55:58]
+Loading Training Cameras [31/01 14:55:58]
+Loading Test Cameras [31/01 14:56:00]
+Number of points at initialisation :  17475 [31/01 14:56:00]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 187/187 [01:20<00:00,  2.31it/s]
+
+[ITER 0] Saving Gaussians [31/01 14:57:47]
+
+[ITER 0] Saving Checkpoint [31/01 14:57:50]
+
+Training complete. [31/01 14:57:50]
+
+
+
+
+
+python render_binary.py \
+    --model_path /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128 \
+    --pq_index ckpts/pq_index.faiss \
+    --threshold 0.0 \
+    --precompute
+
+4. 渲染
+python render_activation.py \
+    -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen \
+    -m /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128 \
+    --semantic_model sam \
+    --feature_level 1 \
+    --pq_index ckpts/pq_index.faiss \
+    --img_label "toaster" \
+    --img_save_label toaster \
+    --threshold 0.55 \
+    -l language_features_dim3 
+    
+python render_binary.py \
+    -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen \
+    -m /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128 \
+    --semantic_model sam \
+    --feature_level 1 \
+    --pq_index ckpts/pq_index.faiss \
+    --img_label "knife" \
+    --img_save_label knife \
+    --threshold 0.55 \
+    --query "knife" \
+    -l language_features_dim3 \
+    --precompute \
+    --precompute_dir /root/autodl-tmp/Dr-Splat/precomputed_features_waldo
+    
+        
+可能会遇到这个问题
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat# python render_activation.py         -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen         -m /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128         --semantic_model sam         --feature_level 1         --pq_index ckpts/pq_index.faiss         --img_label sink 
+Looking for config file in /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/cfg_args
+Traceback (most recent call last):
+  File "/root/autodl-tmp/Dr-Splat/render_activation.py", line 115, in <module>
+    args = get_combined_args(parser)
+  File "/root/autodl-tmp/Dr-Splat/arguments/__init__.py", line 105, in get_combined_args
+    with open(cfgfilepath) as cfg_file:
+FileNotFoundError: [Errno 2] No such file or directory: '/root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/cfg_args'
+
+这个时候在output directory里面创建一个cfg_args,然后把training log的开头粘进去
+
+你也可能会遇到复制进去格式乱了的问题，原因出\后面有空格
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat# python render_activation.py \
+>         -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen \
+>         -m /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128 \
+>         --semantic_model sam \
+>         --feature_level 1 \
+>         --pq_index ckpts/pq_index.faiss \
+>         --img_label sink \  
+usage: render_activation.py [-h] [--sh_degree SH_DEGREE] [--source_path SOURCE_PATH] [--model_path MODEL_PATH] [--language_features_name LANGUAGE_FEATURES_NAME]
+                            [--images IMAGES] [--resolution RESOLUTION] [--white_background] [--feature_level FEATURE_LEVEL] [--data_device DATA_DEVICE] [--eval]
+                            [--convert_SHs_python] [--compute_cov3D_python] [--debug] [--iteration ITERATION] [--skip_train] [--skip_test] [--quiet] [--include_feature]
+                            [--save_ply] [--semantic_model SEMANTIC_MODEL] [--pq_index PQ_INDEX] [--img_save_label IMG_SAVE_LABEL] [--img_label IMG_LABEL]
+                            [--threshold THRESHOLD]
+render_activation.py: error: unrecognized arguments:  
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat#         --img_save_label sink_test \  
+bash: --img_save_label: command not found
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat#         --threshold 0.5 \  
+bash: --threshold: command not found
+(drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat#         -l language_features_dim3
+
+他正确跑完长这样
+drsplat) root@autodl-container-59324ab2f2-7d26b909:~/autodl-tmp/Dr-Splat# python render_activation.py \
+>   -s /root/autodl-tmp/Ref-Lerf/Ref-lerf/waldo_kitchen \
+>   -m /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128 \
+>   --semantic_model sam \
+>   --feature_level 1 \
+>   --pq_index ckpts/pq_index.faiss \
+>   --img_label sink \
+>   --img_save_label sink_test \
+>   --threshold 0.5 \
+>   -l language_features_dim3
+
+Looking for config file in /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/cfg_args
+Config file found: /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/cfg_args
+Rendering /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128
+Reading camera 187/187 [31/01 15:07:58]
+Loading Training Cameras [31/01 15:07:58]
+Loading Test Cameras [31/01 15:08:00]
+Number of points at initialisation :  17475 [31/01 15:08:00]
+Running time : 3.3738608360290527 [31/01 15:08:00]
+Rendering progress: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 187/187 [00:57<00:00,  3.26it/s]
+Rendering progress: 0it [00:00, ?it/s]
+
+测试
+/root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_sink_test/00036.png
+/root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask/frame_00036/dark cup.png
+python miou.py
+
+
+
+
+
+# knife 0.178646
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_knife /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask knife
+
+# ottolenghi
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_ottolenghi /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask ottolenghi
+
+# pour-over vessel
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_pour-over_vessel /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "pour-over vessel"
+
+# stainless_steel_pot 0.100779
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_stainless_steel_pot /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "stainless steel pot"
+
+# yellow_desk 0.052095
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_yellow_desk /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "yellow desk"
+
+# spatula 0.229793
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_spatula /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "spatula"
+
+# plastic_ladle 0.510577
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_plastic_ladle /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "plastic ladle"
+
+# refrigerator 0.670150
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_refrigerator /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "refrigerator"
+
+# pot 0.319434
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_pot /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask pot
+
+# red cup 0.673395
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_red_cup /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "red cup"
+
+# black spoon 0.290671
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_black_spoon /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "black spoon"
+
+# cabinet 0.416378
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_cabinet /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask cabinet
+
+# dark cup 0.387002
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_dark_cup /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "dark cup"
+
+# frog cup 0.407064
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_frog_cup /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask "frog cup"
+
+# ketchup 0.000136
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_ketchup /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask ketchup
+
+# plate 0.380181
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_plate /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask plate
+
+# toaster 0.504071
+python calculate_miou_batch.py /root/autodl-tmp/Dr-Splat/outputs_1_pq_openclip_topk45_weight_128/train/renders_mask_toaster /root/autodl-tmp/Ref-Lerf/waldo_kitchen/gt_mask toaster
+
+
+
+
+
