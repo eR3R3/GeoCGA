@@ -1,13 +1,8 @@
-#
-# Copyright (C) 2023, Inria
-# GRAPHDECO research group, https://team.inria.fr/graphdeco
-# All rights reserved.
-#
-# This software is free for non-commercial, research and evaluation use 
-# under the terms of the LICENSE.md file.
-#
-# For inquiries contact  george.drettakis@inria.fr
-#
+'''
+Originated from Dr-Splat Repository 
+Yuwen Tao 11/5 2025
+'''
+
 import numpy as np
 import torch
 from scene import Scene
@@ -191,19 +186,19 @@ def get_activation_score(dataset : ModelParams, args, label, clip_model, index, 
             "red cup"
         ]
         
-        # 设置所有物体标签为 positives
+        # 让所有物体标签变成positives
         clip_model.set_positives(object_labels)
         
         print("\n" + "="*60)
         print("Relevancy scores between mean_features and object labels:")
         print("="*60)
         
-        # 使用 get_relevancy 函数计算每个物体的分数
+        # get_relevancy 可以计算每个物体的分数
         # mean_features 需要是 [1, feature_dim] 的形状
         mean_features_batch = mean_features.unsqueeze(0)  # [1, feature_dim]
         
         for idx, obj_label in enumerate(object_labels):
-            # 使用 get_relevancy 计算相关性分数
+            # get_relevancy 计算相关性分数
             # positive_id 是当前物体在 positives 列表中的索引
             probs = clip_model.get_relevancy(mean_features_batch, idx)
             # probs: [1, 2], 第一列是正类概率，第二列是负类概率
@@ -224,23 +219,7 @@ def get_activation_score(dataset : ModelParams, args, label, clip_model, index, 
 def render_activation_score(dataset : ModelParams, pipeline : PipelineParams, gaussians, scene, 
                             activation_features, background, args, label, clip_model, 
                             img_save_label, skip_train : bool, skip_test : bool):
-    """
-    渲染activation score
     
-    Args:
-        dataset: 模型参数
-        pipeline: 管道参数
-        gaussians: GaussianModel对象
-        scene: Scene对象
-        activation_features: [gaussian_num, 1] 每个gaussian的激活分数
-        background: 背景颜色tensor
-        args: 命令行参数
-        label: 标签索引
-        clip_model: CLIP模型
-        img_save_label: 图像保存标签
-        skip_train: 是否跳过训练集
-        skip_test: 是否跳过测试集
-    """
     with torch.no_grad():
         start_time = time.time()
         
@@ -257,20 +236,10 @@ def render_activation_score(dataset : ModelParams, pipeline : PipelineParams, ga
                        label, clip_model, img_save_label, activation_features, thr, args.mask_percentile)
         
         end_time = time.time()
-        print(f'Render activation score time: {end_time - start_time}s')
+        print(f'time: {end_time - start_time}s')
 
 
 def save_precomputed_features(object_label, mean_features, mean_position, activation_features, save_dir="precomputed_features"):
-    """
-    保存预计算的 mean features, mean position 和 activation features
-    
-    Args:
-        object_label: 物体标签名称
-        mean_features: [feature_dim] 平均特征向量
-        mean_position: [3] 平均空间位置
-        activation_features: [gaussian_num, 1] 每个gaussian的激活分数
-        save_dir: 保存目录
-    """
     os.makedirs(save_dir, exist_ok=True)
     
     safe_label = object_label.replace(" ", "_").replace("/", "-")
@@ -288,15 +257,6 @@ def save_precomputed_features(object_label, mean_features, mean_position, activa
 
 
 def load_precomputed_features(save_dir="precomputed_features"):
-    """
-    加载所有预计算的特征
-    
-    Args:
-        save_dir: 保存目录
-        
-    Returns:
-        dict: {object_label: {'mean_features': tensor, 'mean_position': tensor, 'activation_features': tensor}}
-    """
     precomputed_data = {}
     
     if not os.path.exists(save_dir):
@@ -320,19 +280,6 @@ def load_precomputed_features(save_dir="precomputed_features"):
 
 
 def find_best_matching_object(query_text, precomputed_data, clip_model):
-    """
-    根据 query 文本找到最匹配的物体
-    
-    Args:
-        query_text: 查询文本
-        precomputed_data: 预计算的数据字典
-        clip_model: CLIP模型
-        
-    Returns:
-        best_object_label: 最匹配的物体标签
-        best_score: 最高分数
-        best_activation_features: 对应的activation features
-    """
     # 编码查询文本
     query_embedding = clip_model.encode_text(query_text, device="cuda").float()
     query_embedding = query_embedding / query_embedding.norm(dim=-1, keepdim=True)
@@ -367,17 +314,6 @@ def find_best_matching_object(query_text, precomputed_data, clip_model):
 
 
 def precompute_all_objects(dataset : ModelParams, args, clip_model, index, object_labels, save_dir="precomputed_features"):
-    """
-    预计算所有物体的 mean features 和 activation features
-    
-    Args:
-        dataset: 模型参数
-        args: 命令行参数
-        clip_model: CLIP模型
-        index: FAISS索引
-        object_labels: 物体标签列表
-        save_dir: 保存目录
-    """
     print("\n" + "="*60)
     print("Precomputing features for all objects...")
     print("="*60 + "\n")
@@ -422,15 +358,12 @@ def precompute_all_objects(dataset : ModelParams, args, clip_model, index, objec
 
 
 def render_sets(dataset : ModelParams, pipeline : PipelineParams, skip_train : bool, skip_test : bool, args, label, clip_model, index, img_save_label):
-    """
-    原有的render_sets函数，现在调用get_activation_score和render_activation_score
-    """
-    # 1. 获取activation score
+    # 获取activation score
     gaussians, scene, activation_features, background = get_activation_score(
         dataset, args, label, clip_model, index
     )
     
-    # 2. 渲染activation score
+    # 渲染activation score
     render_activation_score(
         dataset, pipeline, gaussians, scene, activation_features, background,
         args, label, clip_model, img_save_label, skip_train, skip_test
@@ -439,19 +372,6 @@ def render_sets(dataset : ModelParams, pipeline : PipelineParams, skip_train : b
 
 def render_from_query(dataset : ModelParams, pipeline : PipelineParams, skip_train : bool, skip_test : bool, 
                       args, query_text, clip_model, precomputed_data):
-    """
-    根据 query 文本渲染（使用预计算的数据）
-    
-    Args:
-        dataset: 模型参数
-        pipeline: 管道参数
-        skip_train: 是否跳过训练集
-        skip_test: 是否跳过测试集
-        args: 命令行参数
-        query_text: 查询文本
-        clip_model: CLIP模型
-        precomputed_data: 预计算的数据字典
-    """
     # 找到最匹配的物体
     best_object_label, best_score, activation_features = find_best_matching_object(
         query_text, precomputed_data, clip_model
@@ -485,7 +405,6 @@ def render_from_query(dataset : ModelParams, pipeline : PipelineParams, skip_tra
 
 
 if __name__ == "__main__":
-    # Set up command line argument parser
     
     parser = ArgumentParser(description="Testing script parameters")
     model = ModelParams(parser, sentinel=True)
@@ -502,8 +421,6 @@ if __name__ == "__main__":
     parser.add_argument("--img_label", type=str, default=None)
     parser.add_argument("--threshold", type=float, default=0.0)
     parser.add_argument("--mask_percentile", type=float, default=0.90, help="Percentile threshold for mask (0.90 = keep top 10% of activations)")
-    
-    # 新增参数
     parser.add_argument("--precompute", action="store_true", help="Precompute features for all objects")
     parser.add_argument("--query", type=str, default="", help="Query text to find matching object and render")
     parser.add_argument("--precompute_dir", type=str, default="precomputed_features_waldo", help="Directory to save/load precomputed features")
@@ -517,7 +434,8 @@ if __name__ == "__main__":
     clip_model = OpenCLIPNetwork(device)
     index = faiss.read_index(args.pq_index)
 
-    # 定义所有物体标签
+    # these are all objects for datasets kitchen, the masks are segmented using 2D foundation model Grounded-Sam
+    # for more information, checkout paper ReferSplat and their dataset Ref-Lerf
     all_object_labels = [
         "knife",
         "ottolenghi",
@@ -538,31 +456,28 @@ if __name__ == "__main__":
         "red cup"
     ]
 
-    
-    print("\n=== Final args after get_combined_args ===")
     print("\n".join([f"{k} = {v}" for k, v in sorted(vars(args).items())]))
-    print("=========================================\n")
     
     print(args.precompute)
     print(args.query)
-    # 模式1: 预计算所有物体
+    # if not precomputed yet, do precompute, the clustering happens here
     if args.precompute:
         print("\n" + "="*60)
-        print("MODE: PRECOMPUTE ALL OBJECTS")
+        print("precomput")
         print("="*60)
         precompute_all_objects(
             model.extract(args), args, clip_model, index, 
             all_object_labels, args.precompute_dir
         )
     
-    # 模式2: 根据 query 渲染
+    # if already precomputed, render based on query
     elif args.query != "":
         print("\n" + "="*60)
-        print(f"MODE: QUERY-BASED RENDERING")
+        print(f"rendering using query")
         print(f"Query: '{args.query}'")
         print("="*60)
         
-        # 加载预计算的数据
+        # 加载precompute数据
         precomputed_data = load_precomputed_features(args.precompute_dir)
         
         if not precomputed_data:
@@ -575,10 +490,10 @@ if __name__ == "__main__":
                 args.query, clip_model, precomputed_data
             )
     
-    # 模式3: 原有的单个物体渲染模式（兼容性）
+    # using original way, which is selecting gaussians to render
     elif args.img_label is not None:
         print("\n" + "="*60)
-        print(f"MODE: SINGLE OBJECT RENDERING")
+        print(f"original rendering")
         print(f"Object: '{args.img_label}'")
         print("="*60)
         
