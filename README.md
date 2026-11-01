@@ -1,5 +1,7 @@
 # Geo-CGA
-Implementation of paper GeoCGA. To see our paper, visit [arxiv](https://arxiv.org).
+Implementation of paper GeoCGA. To see our paper, visit [CVF](https://openaccess.thecvf.com/content/CVPR2026/papers/Tao_Geometry-Aware_Cross-Modal_Graph_Alignment_for_Referring_Segmentation_in_3D_Gaussian_CVPR_2026_paper.pdf).
+<img width="1572" height="577" alt="image" src="https://github.com/user-attachments/assets/534020b5-c562-433d-a200-ccdb6500f226" />
+
 
 ## Configuration
 Please refer to the [Dr-Splat Codebase](https://github.com/kaist-ami/Dr-Splat) for configuration  
