@@ -1,6 +1,23 @@
-# Geo-CGA
-Implementation of paper GeoCGA. To see our paper, visit [CVF](https://openaccess.thecvf.com/content/CVPR2026/papers/Tao_Geometry-Aware_Cross-Modal_Graph_Alignment_for_Referring_Segmentation_in_3D_Gaussian_CVPR_2026_paper.pdf).
+<p align="center">
+  <h1 align="center">GeoCGA: Geometry-Aware Cross-Modal Graph Alignment for Referring Segmentation in 3D Gaussian Splatting</h1>
+ <p align="center">
+    <a href="[https://arxiv.org/abs/2511.03992](https://openaccess.thecvf.com/content/CVPR2026/papers/Tao_Geometry-Aware_Cross-Modal_Graph_Alignment_for_Referring_Segmentation_in_3D_Gaussian_CVPR_2026_paper.pdf)" target="_blank" rel="noopener noreferrer">
+      <img src='https://img.shields.io/badge/Paper-PDF-green?style=flat&logo=arXiv&' alt='arXiv PDF'>
+    </a>
+  </p>
+</p>
+
+---
+
+
+This paper presents **Camera-Aware Referring Field (CaRF)**, a novel framework for referring segmentation in 3D Gaussian splatting that explicitly models view-dependent geometry and multi-view consistency. CaRF introduces two key components: (1) **In-Training Paired-View Supervision (ITPVS)**, which enforces consistency across calibrated camera views by jointly supervising Gaussian projections; and (2) **Gaussian Field Camera Encoding (GFCE)**, which integrates camera parameters into the Gaussian–language feature space to enhance geometric reasoning.  Extensive experiments on the **Ref-LERF**, **LERF-OVS**, and **3D-OVS** datasets demonstrate that CaRF achieves consistent improvements over existing methods while maintaining robust cross-view alignment and fine-grained semantic precision.  
+
 <img width="1572" height="577" alt="image" src="https://github.com/user-attachments/assets/534020b5-c562-433d-a200-ccdb6500f226" />
+
+---
+
+
+
 
 
 ## Configuration
