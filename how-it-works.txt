@@ -1,0 +1,64 @@
+Dr-Splat
+Pre-training
+Use SAM to automatically generate multi-scale masks (four levels: default, s, m, l).
+Extract a CLIP feature for each mask region.
+Run mask NMS (non-maximum suppression) to remove redundant masks.
+Save the features and segmentation map for each image.
+
+The output format is as follows. Each view’s image produces two files.
+
+File 1
+
+{image_name}_s.npy, with shape [4, H, W]
+
+The 4 corresponds to SAM’s four segmentation scale levels. However, the Dr-Splat codebase uses the largest mask for all four channels, so all four are identical.
+
+Each channel is an [H, W] map that contains all the masks, with each mask labeled by a different integer. Below is an AI-generated example:
+
+seg_map (10×10):
+-1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+-1   0   0   0  -1  -1  -1  -1  -1  -1
+-1   0   0   0  -1  -1  -1  -1  -1  -1
+-1   0   0   0  -1  -1   1   1   1  -1
+-1  -1  -1  -1  -1  -1   1   1   1  -1
+-1  -1  -1  -1  -1  -1   1   1   1  -1
+-1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+-1  -1  -1  -1  -1   2   2   2  -1  -1
+-1  -1  -1  -1  -1   2   2   2  -1  -1
+-1  -1  -1  -1  -1  -1  -1  -1  -1  -1
+-1 means no mask
+0 means mask 0
+1 means mask 1
+...
+
+Note: a pixel can never belong to two masks. If two masks do overlap, the later mask overwrites the earlier one.
+
+File 2
+
+{image_name}_f.npy stores the CLIP feature vector for each mask.
+
+Its shape is [num_masks, 512], where 512 is the vector dimension. The vectors are already L2-normalized.
+
+The indices along num_masks match the mask labels in the {image_name}_s.npy file above.
+
+You can use the following line to check how many objects were segmented:
+
+bash
+python -c "import numpy as np; a=np.load('your.npy'); print('shape:', a.shape, 'dtype:', a.dtype)"
+Training
+
+First load the pre-trained RGB 3DGS model, then run Majority Voting.
+
+Majority Voting
+Render each training view to get the Gaussian IDs and contribution weights for each pixel.
+Use the segmentation map to assign CLIP features to the corresponding Gaussians.
+Assign each Gaussian a language feature using a top-k contribution-weighted average.
+Register the assigned language features in the Gaussian model.
+Save the updated model checkpoint.
+Rendering
+Load the trained model.
+Decode the Gaussians’ language features.
+Encode the text query with the CLIP model.
+Compute the activation (similarity) between each Gaussian’s feature and the text query.
+Filter Gaussians by a threshold.
+Map the activations to colors and render.
